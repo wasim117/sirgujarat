@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Grid Layout Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .test-container {
+            padding: 2rem;
+            background-color: #f5f5f5;
+        }
+        .breakpoint-info {
+            background-color: white;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .breakpoint-info h2 {
+            margin: 0 0 0.5rem 0;
+            color: #007bff;
+        }
+        .breakpoint-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .test-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 640px) {
+            .test-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+        }
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .test-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.25rem;
+            }
+        }
+        @media (min-width: 1025px) {
+            .test-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        .test-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .test-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        .test-card-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+        .test-card-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Responsive Grid Layout Test</h1>
+        
+        <div class="breakpoint-info">
+            <h2>Current Breakpoint</h2>
+            <p id="current-breakpoint">Resize your browser to test different breakpoints</p>
+        </div>
+
+        <h2>Test Grid (12 items)</h2>
+        <div class="test-grid">
+            <div class="test-card">
+                <div class="test-card-number">1</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">2</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">3</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">4</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">5</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">6</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">7</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">8</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">9</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">10</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">11</div>
+                <div class="test-card-label">Card</div>
+            </div>
+            <div class="test-card">
+                <div class="test-card-number">12</div>
+                <div class="test-card-label">Card</div>
+            </div>
+        </div>
+
+        <div class="breakpoint-info">
+            <h2>Breakpoint Guide</h2>
+            <p><strong>Mobile (≤ 640px):</strong> 2 columns with 1rem gap</p>
+            <p><strong>Tablet (641px - 1024px):</strong> 3 columns with 1.25rem gap</p>
+            <p><strong>Desktop (≥ 1025px):</strong> 4 columns with 1.5rem gap</p>
+        </div>
+    </div>
+
+    <script>
+        function updateBreakpoint() {
+            const width = window.innerWidth;
+            let breakpoint = '';
+            let columns = '';
+
+            if (width <= 640) {
+                breakpoint = 'Mobile';
+                columns = '2 columns';
+            } else if (width <= 1024) {
+                breakpoint = 'Tablet';
+                columns = '3 columns';
+            } else if (width <= 1400) {
+                breakpoint = 'Desktop';
+                columns = '4 columns';
+            } else {
+                breakpoint = 'Large Desktop';
+                columns = '5 columns';
+            }
+
+            document.getElementById('current-breakpoint').textContent = 
+                `${breakpoint} (${width}px) - ${columns}`;
+        }
+
+        window.addEventListener('resize', updateBreakpoint);
+        updateBreakpoint();
+    </script>
+</body>
+</html>

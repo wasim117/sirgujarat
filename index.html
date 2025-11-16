@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse and access PDF documents from the P064 address collection through an interactive gallery interface.">
+    <meta name="theme-color" content="#007bff">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="PDF Gallery Viewer - P064 Collection">
+    <meta property="og:description" content="Interactive gallery for browsing address images and accessing PDF documents.">
+    <meta property="og:type" content="website">
+    
+    <title>PDF Gallery Viewer - P064 Collection</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>PDF Gallery Viewer</h1>
+            <p class="collection-description">Browse address images from the P064 collection and access corresponding PDF documents</p>
+            <div class="statistics">
+                <span class="stat-item">
+                    <span class="stat-label">Total Documents:</span>
+                    <span class="stat-value" id="total-documents">0</span>
+                </span>
+                <span class="stat-item">
+                    <span class="stat-label">Last Updated:</span>
+                    <span class="stat-value" id="last-updated">Loading...</span>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navigation">
+        <div class="nav-content">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    class="search-input" 
+                    placeholder="Search by filename or document number..."
+                    aria-label="Search gallery images"
+                >
+                <button id="clear-search" class="clear-button" aria-label="Clear search">Clear</button>
+            </div>
+            <div class="search-results">
+                <span id="result-count" class="result-count">0 results</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading gallery...</p>
+        </div>
+        
+        <div id="gallery-grid" class="gallery-grid" role="region" aria-label="Image gallery">
+            <!-- Image cards will be generated here by JavaScript -->
+        </div>
+
+        <div id="no-results" class="no-results" style="display: none;">
+            <p>No images found matching your search.</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 PDF Gallery Viewer. All rights reserved.</p>
+            <p>Deployed on Vercel | <a href="https://github.com" target="_blank" rel="noopener noreferrer">View Source</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
