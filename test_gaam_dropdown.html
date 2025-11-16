@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Gaam Dropdown Population</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        select {
+            padding: 8px;
+            margin: 10px 0;
+            width: 100%;
+            font-size: 14px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Gaam Dropdown Population</h1>
+    
+    <div class="test-section">
+        <h2>Test Setup</h2>
+        <p>This test verifies that the populateGaamDropdown function works correctly.</p>
+        <button onclick="runTests()">Run Tests</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Dropdowns</h2>
+        <label for="gaam-filter">Gaam Dropdown:</label>
+        <select id="gaam-filter">
+            <option value="">Select Gaam</option>
+        </select>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // Mock galleryState
+        let galleryState = {
+            filterState: {
+                availableGaams: [],
+                locationData: {}
+            }
+        };
+
+        // Load sample location data
+        async function loadSampleData() {
+            try {
+                const response = await fetch('extracted_data.json');
+                const locationData = await response.json();
+                
+                galleryState.filterState.locationData = locationData;
+                
+                // Extract unique gaams
+                const gaams = new Set();
+                Object.values(locationData).forEach((entry) => {
+                    if (entry.gaam) {
+                        gaams.add(entry.gaam);
+                    }
+                });
+                
+                galleryState.filterState.availableGaams = Array.from(gaams).sort();
+                
+                return true;
+            } catch (error) {
+                console.error('Failed to load sample data:', error);
+                return false;
+            }
+        }
+
+        // Copy of the populateGaamDropdown function from script.js
+        function populateGaamDropdown(selectedTaluko = null) {
+            const gaamDropdown = document.getElementById('gaam-filter');
+            
+            if (!gaamDropdown) {
+                console.error('Gaam dropdown element not found');
+                return;
+            }
+            
+            // Clear existing options except the default one
+            gaamDropdown.innerHTML = '<option value="">Select Gaam</option>';
+            
+            let gaamsToDisplay = [];
+            
+            // If a taluko is selected, filter gaams by that taluko
+            if (selectedTaluko) {
+                const locationData = galleryState.filterState.locationData;
+                const gaamSet = new Set();
+                
+                // Iterate through location data to find gaams in the selected taluko
+                Object.values(locationData).forEach((entry) => {
+                    if (entry.taluko === selectedTaluko && entry.gaam) {
+                        gaamSet.add(entry.gaam);
+                    }
+                });
+                
+                // Convert to array and sort alphabetically
+                gaamsToDisplay = Array.from(gaamSet).sort();
+            } else {
+                // No taluko selected, show all unique gaams (already sorted in state)
+                gaamsToDisplay = galleryState.filterState.availableGaams;
+            }
+            
+            // Create and append option elements for each gaam
+            gaamsToDisplay.forEach((gaam) => {
+                const option = document.createElement('option');
+                option.value = gaam;
+                option.textContent = gaam;
+                gaamDropdown.appendChild(option);
+            });
+            
+            console.log(`Populated gaam dropdown with ${gaamsToDisplay.length} options` + 
+                        (selectedTaluko ? ` (filtered by taluko: ${selectedTaluko})` : ' (all gaams)'));
+            
+            return gaamsToDisplay.length;
+        }
+
+        // Test functions
+        function addTestResult(testName, passed, message) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            resultDiv.innerHTML = `<strong>${testName}:</strong> ${passed ? 'PASS' : 'FAIL'} - ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        async function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<p>Running tests...</p>';
+            
+            // Load sample data first
+            const dataLoaded = await loadSampleData();
+            if (!dataLoaded) {
+                addTestResult('Data Loading', false, 'Failed to load extracted_data.json');
+                return;
+            }
+            addTestResult('Data Loading', true, `Loaded ${Object.keys(galleryState.filterState.locationData).length} documents`);
+            
+            // Test 1: Populate with no taluko selected (show all gaams)
+            const allGaamsCount = populateGaamDropdown();
+            const dropdown = document.getElementById('gaam-filter');
+            const optionCount = dropdown.options.length - 1; // Exclude default option
+            addTestResult(
+                'Test 1: Show all gaams when no taluko selected',
+                optionCount === allGaamsCount && allGaamsCount > 0,
+                `Expected ${allGaamsCount} options, got ${optionCount}`
+            );
+            
+            // Test 2: Check alphabetical sorting
+            const options = Array.from(dropdown.options).slice(1); // Skip default option
+            const isSorted = options.every((opt, i) => {
+                if (i === 0) return true;
+                return opt.textContent >= options[i - 1].textContent;
+            });
+            addTestResult(
+                'Test 2: Gaams are sorted alphabetically',
+                isSorted,
+                isSorted ? 'All options are in alphabetical order' : 'Options are not sorted'
+            );
+            
+            // Test 3: Filter by specific taluko
+            const sampleTaluko = 'ગાંધીનગર'; // Use a known taluko from the data
+            const filteredCount = populateGaamDropdown(sampleTaluko);
+            const filteredOptions = dropdown.options.length - 1;
+            addTestResult(
+                'Test 3: Filter gaams by taluko',
+                filteredOptions === filteredCount && filteredCount > 0 && filteredCount < allGaamsCount,
+                `Filtered to ${filteredCount} gaams for taluko "${sampleTaluko}"`
+            );
+            
+            // Test 4: Verify filtered gaams belong to selected taluko
+            const filteredGaams = Array.from(dropdown.options).slice(1).map(opt => opt.value);
+            const allBelongToTaluko = filteredGaams.every(gaam => {
+                return Object.values(galleryState.filterState.locationData).some(entry => 
+                    entry.taluko === sampleTaluko && entry.gaam === gaam
+                );
+            });
+            addTestResult(
+                'Test 4: Filtered gaams belong to selected taluko',
+                allBelongToTaluko,
+                allBelongToTaluko ? 'All gaams belong to the selected taluko' : 'Some gaams do not belong to the selected taluko'
+            );
+            
+            // Test 5: Default option is always present
+            const hasDefaultOption = dropdown.options[0].value === '' && dropdown.options[0].textContent === 'Select Gaam';
+            addTestResult(
+                'Test 5: Default option is present',
+                hasDefaultOption,
+                hasDefaultOption ? 'Default "Select Gaam" option exists' : 'Default option is missing'
+            );
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Location Data Loading</title>
+</head>
+<body>
+    <h1>Location Data Loading Test</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        // Minimal state for testing
+        let galleryState = {
+            filterState: {
+                selectedTaluko: null,
+                selectedGaam: null,
+                availableTalukos: [],
+                availableGaams: [],
+                locationData: {}
+            }
+        };
+        
+        // Copy of the loadLocationData function
+        async function loadLocationData() {
+            try {
+                console.log('Loading location data from extracted_data.json...');
+                
+                const response = await fetch('extracted_data.json');
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch location data: ${response.status} ${response.statusText}`);
+                }
+                
+                const locationData = await response.json();
+                
+                if (!locationData || typeof locationData !== 'object') {
+                    throw new Error('Invalid location data format: expected an object');
+                }
+                
+                galleryState.filterState.locationData = locationData;
+                
+                const talukos = new Set();
+                const gaams = new Set();
+                
+                Object.values(locationData).forEach((entry) => {
+                    if (entry.taluko) {
+                        talukos.add(entry.taluko);
+                    }
+                    if (entry.gaam) {
+                        gaams.add(entry.gaam);
+                    }
+                });
+                
+                galleryState.filterState.availableTalukos = Array.from(talukos).sort();
+                galleryState.filterState.availableGaams = Array.from(gaams).sort();
+                
+                console.log(`Location data loaded successfully:`);
+                console.log(`- ${Object.keys(locationData).length} documents`);
+                console.log(`- ${galleryState.filterState.availableTalukos.length} unique talukos`);
+                console.log(`- ${galleryState.filterState.availableGaams.length} unique gaams`);
+                
+                return true;
+            } catch (error) {
+                console.error('Failed to load location data:', error);
+                return false;
+            }
+        }
+        
+        // Run test
+        async function runTest() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<p>Loading...</p>';
+            
+            const success = await loadLocationData();
+            
+            if (success) {
+                const documentCount = Object.keys(galleryState.filterState.locationData).length;
+                const talukoCount = galleryState.filterState.availableTalukos.length;
+                const gaamCount = galleryState.filterState.availableGaams.length;
+                
+                resultsDiv.innerHTML = `
+                    <h2 style="color: green;">✓ Test Passed</h2>
+                    <p><strong>Documents loaded:</strong> ${documentCount}</p>
+                    <p><strong>Unique Talukos:</strong> ${talukoCount}</p>
+                    <p><strong>Unique Gaams:</strong> ${gaamCount}</p>
+                    <h3>Sample Talukos:</h3>
+                    <ul>${galleryState.filterState.availableTalukos.slice(0, 5).map(t => `<li>${t}</li>`).join('')}</ul>
+                    <h3>Sample Gaams:</h3>
+                    <ul>${galleryState.filterState.availableGaams.slice(0, 5).map(g => `<li>${g}</li>`).join('')}</ul>
+                    <h3>Sample Location Data:</h3>
+                    <pre>${JSON.stringify(Object.entries(galleryState.filterState.locationData).slice(0, 3), null, 2)}</pre>
+                `;
+            } else {
+                resultsDiv.innerHTML = '<h2 style="color: red;">✗ Test Failed</h2><p>Check console for errors</p>';
+            }
+        }
+        
+        // Run test on page load
+        window.addEventListener('DOMContentLoaded', runTest);
+    </script>
+</body>
+</html>

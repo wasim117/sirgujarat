@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Clear Filters Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .test-controls button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-controls button:hover {
+            background-color: #0056b3;
+        }
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-dropdown {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .clear-filters-button {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .clear-filters-button:hover {
+            background-color: #c82333;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .state-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .state-display h3 {
+            margin-top: 0;
+        }
+        .state-item {
+            margin-bottom: 10px;
+        }
+        .state-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .state-value {
+            color: #007bff;
+            font-family: monospace;
+        }
+        .test-result {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .test-result.pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-result.fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .image-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            text-align: center;
+        }
+        .image-card.hidden {
+            display: none;
+        }
+        .result-count {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clear Filters Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <div class="test-controls">
+            <button onclick="runTest1()">Test 1: Clear Taluko Only</button>
+            <button onclick="runTest2()">Test 2: Clear Gaam Only</button>
+            <button onclick="runTest3()">Test 3: Clear Both Filters</button>
+            <button onclick="runTest4()">Test 4: Maintain Search Text</button>
+            <button onclick="runTest5()">Test 5: Trigger Display Update</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Filter Interface</h2>
+        
+        <div class="filter-group">
+            <label for="search-input">Search:</label>
+            <input 
+                type="text" 
+                id="search-input" 
+                class="search-input" 
+                placeholder="Search by filename or document number..."
+            >
+        </div>
+        
+        <div class="filter-group">
+            <label for="taluko-filter">Taluko (District):</label>
+            <select id="taluko-filter" class="filter-dropdown">
+                <option value="">Select Taluko</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="gaam-filter">Gaam (Village):</label>
+            <select id="gaam-filter" class="filter-dropdown">
+                <option value="">Select Gaam</option>
+            </select>
+        </div>
+        
+        <button id="clear-filters" class="clear-filters-button">
+            Clear Filters
+        </button>
+        
+        <div class="state-display">
+            <h3>Current State</h3>
+            <div class="state-item">
+                <span class="state-label">Selected Taluko:</span>
+                <span class="state-value" id="state-taluko">null</span>
+            </div>
+            <div class="state-item">
+                <span class="state-label">Selected Gaam:</span>
+                <span class="state-value" id="state-gaam">null</span>
+            </div>
+            <div class="state-item">
+                <span class="state-label">Search Term:</span>
+                <span class="state-value" id="state-search">""</span>
+            </div>
+            <div class="state-item">
+                <span class="state-label">Taluko Dropdown Value:</span>
+                <span class="state-value" id="state-taluko-dropdown">""</span>
+            </div>
+            <div class="state-item">
+                <span class="state-label">Gaam Dropdown Value:</span>
+                <span class="state-value" id="state-gaam-dropdown">""</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Gallery Display</h2>
+        <div class="result-count" id="result-count">0 results</div>
+        <div id="gallery-grid" class="gallery-grid">
+            <!-- Image cards will be generated here -->
+        </div>
+        <div id="no-results" style="display: none;">No results found</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // Mock gallery state
+        let galleryState = {
+            allImages: [],
+            filteredImages: [],
+            imageMetadata: {},
+            searchTerm: '',
+            filterState: {
+                selectedTaluko: null,
+                selectedGaam: null,
+                availableTalukos: [],
+                availableGaams: [],
+                locationData: {}
+            }
+        };
+
+        // Mock location data
+        const mockLocationData = {
+            'P0640001': { taluko: 'ગાંધીનગર', gaam: 'ઉવારસદ' },
+            'P0640002': { taluko: 'ગાંધીનગર', gaam: 'ઉવારસદ' },
+            'P0640003': { taluko: 'ગાંધીનગર', gaam: 'સરગાસણ' },
+            'P0640004': { taluko: 'દસક્રોઈ', gaam: 'શેરથા' },
+            'P0640005': { taluko: 'દસક્રોઈ', gaam: 'મોટા' },
+            'P0640006': { taluko: 'સીટી', gaam: 'સેક્ટર-1' }
+        };
+
+        // Initialize mock data
+        function initializeMockData() {
+            galleryState.allImages = Object.keys(mockLocationData).map(id => `${id}.jpg`);
+            galleryState.filteredImages = [...galleryState.allImages];
+            galleryState.filterState.locationData = mockLocationData;
+            
+            // Extract unique values
+            const talukos = new Set();
+            const gaams = new Set();
+            Object.values(mockLocationData).forEach(entry => {
+                talukos.add(entry.taluko);
+                gaams.add(entry.gaam);
+            });
+            
+            galleryState.filterState.availableTalukos = Array.from(talukos).sort();
+            galleryState.filterState.availableGaams = Array.from(gaams).sort();
+            
+            // Populate dropdowns
+            populateTalukoDropdown();
+            populateGaamDropdown();
+            
+            // Generate gallery cards
+            generateImageCards(galleryState.allImages);
+            
+            updateStateDisplay();
+        }
+
+        function populateTalukoDropdown() {
+            const dropdown = document.getElementById('taluko-filter');
+            dropdown.innerHTML = '<option value="">Select Taluko</option>';
+            galleryState.filterState.availableTalukos.forEach(taluko => {
+                const option = document.createElement('option');
+                option.value = taluko;
+                option.textContent = taluko;
+                dropdown.appendChild(option);
+            });
+        }
+
+        function populateGaamDropdown(selectedTaluko = null) {
+            const dropdown = document.getElementById('gaam-filter');
+            dropdown.innerHTML = '<option value="">Select Gaam</option>';
+            
+            let gaamsToDisplay = [];
+            if (selectedTaluko) {
+                const gaamSet = new Set();
+                Object.values(galleryState.filterState.locationData).forEach(entry => {
+                    if (entry.taluko === selectedTaluko) {
+                        gaamSet.add(entry.gaam);
+                    }
+                });
+                gaamsToDisplay = Array.from(gaamSet).sort();
+            } else {
+                gaamsToDisplay = galleryState.filterState.availableGaams;
+            }
+            
+            gaamsToDisplay.forEach(gaam => {
+                const option = document.createElement('option');
+                option.value = gaam;
+                option.textContent = gaam;
+                dropdown.appendChild(option);
+            });
+        }
+
+        function generateImageCards(images) {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = '';
+            images.forEach(filename => {
+                const card = document.createElement('div');
+                card.className = 'image-card';
+                card.setAttribute('data-filename', filename);
+                card.textContent = filename;
+                grid.appendChild(card);
+            });
+        }
+
+        function setTalukoFilter(taluko) {
+            galleryState.filterState.selectedTaluko = taluko;
+        }
+
+        function setGaamFilter(gaam) {
+            galleryState.filterState.selectedGaam = gaam;
+        }
+
+        function clearFilters() {
+            galleryState.filterState.selectedTaluko = null;
+            galleryState.filterState.selectedGaam = null;
+        }
+
+        function filterImages(searchTerm) {
+            galleryState.searchTerm = searchTerm.toLowerCase();
+            let filtered = [...galleryState.allImages];
+            
+            const { selectedTaluko, selectedGaam, locationData } = galleryState.filterState;
+            
+            if (selectedTaluko || selectedGaam) {
+                filtered = filtered.filter(filename => {
+                    const docId = filename.replace('.jpg', '');
+                    const location = locationData[docId];
+                    if (!location) return false;
+                    if (selectedTaluko && location.taluko !== selectedTaluko) return false;
+                    if (selectedGaam && location.gaam !== selectedGaam) return false;
+                    return true;
+                });
+            }
+            
+            if (galleryState.searchTerm) {
+                filtered = filtered.filter(filename => 
+                    filename.toLowerCase().includes(galleryState.searchTerm)
+                );
+            }
+            
+            galleryState.filteredImages = filtered;
+            updateGalleryDisplay();
+            updateResultCount();
+        }
+
+        function updateGalleryDisplay() {
+            const cards = document.querySelectorAll('.image-card');
+            cards.forEach(card => {
+                const filename = card.getAttribute('data-filename');
+                if (galleryState.filteredImages.includes(filename)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        function updateResultCount() {
+            const count = galleryState.filteredImages.length;
+            document.getElementById('result-count').textContent = `${count} results`;
+        }
+
+        function updateStateDisplay() {
+            document.getElementById('state-taluko').textContent = 
+                galleryState.filterState.selectedTaluko || 'null';
+            document.getElementById('state-gaam').textContent = 
+                galleryState.filterState.selectedGaam || 'null';
+            document.getElementById('state-search').textContent = 
+                `"${galleryState.searchTerm}"`;
+            document.getElementById('state-taluko-dropdown').textContent = 
+                `"${document.getElementById('taluko-filter').value}"`;
+            document.getElementById('state-gaam-dropdown').textContent = 
+                `"${document.getElementById('gaam-filter').value}"`;
+        }
+
+        // Set up event listeners
+        document.getElementById('taluko-filter').addEventListener('change', (e) => {
+            const selectedTaluko = e.target.value || null;
+            setTalukoFilter(selectedTaluko);
+            populateGaamDropdown(selectedTaluko);
+            document.getElementById('gaam-filter').value = '';
+            setGaamFilter(null);
+            filterImages(galleryState.searchTerm);
+            updateStateDisplay();
+        });
+
+        document.getElementById('gaam-filter').addEventListener('change', (e) => {
+            const selectedGaam = e.target.value || null;
+            setGaamFilter(selectedGaam);
+            filterImages(galleryState.searchTerm);
+            updateStateDisplay();
+        });
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            filterImages(e.target.value);
+            updateStateDisplay();
+        });
+
+        // CLEAR FILTERS BUTTON - This is what we're testing
+        document.getElementById('clear-filters').addEventListener('click', () => {
+            const talukoDropdown = document.getElementById('taluko-filter');
+            const gaamDropdown = document.getElementById('gaam-filter');
+            
+            // Reset taluko dropdown to default option
+            if (talukoDropdown) {
+                talukoDropdown.value = '';
+            }
+            
+            // Reset gaam dropdown to default option
+            if (gaamDropdown) {
+                gaamDropdown.value = '';
+            }
+            
+            // Clear filter state
+            clearFilters();
+            
+            // Repopulate gaam dropdown to show all gaams
+            populateGaamDropdown(null);
+            
+            // Trigger gallery display update
+            filterImages(galleryState.searchTerm);
+            
+            updateStateDisplay();
+        });
+
+        // Test functions
+        function addTestResult(testName, passed, message) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            resultDiv.innerHTML = `<strong>${testName}:</strong> ${passed ? '✓ PASS' : '✗ FAIL'} - ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function runTest1() {
+            // Test 1: Clear Taluko Only
+            document.getElementById('test-results').innerHTML = '';
+            
+            // Set up: Select a taluko
+            const talukoDropdown = document.getElementById('taluko-filter');
+            talukoDropdown.value = 'ગાંધીનગર';
+            talukoDropdown.dispatchEvent(new Event('change'));
+            
+            // Verify taluko is set
+            const talukoSetBefore = galleryState.filterState.selectedTaluko === 'ગાંધીનગર';
+            
+            // Click clear filters
+            document.getElementById('clear-filters').click();
+            
+            // Verify taluko dropdown is reset
+            const dropdownReset = talukoDropdown.value === '';
+            const stateCleared = galleryState.filterState.selectedTaluko === null;
+            
+            const passed = talukoSetBefore && dropdownReset && stateCleared;
+            addTestResult('Test 1: Clear Taluko Only', passed, 
+                `Taluko was set: ${talukoSetBefore}, Dropdown reset: ${dropdownReset}, State cleared: ${stateCleared}`);
+        }
+
+        function runTest2() {
+            // Test 2: Clear Gaam Only
+            document.getElementById('test-results').innerHTML = '';
+            
+            // Set up: Select a gaam
+            const gaamDropdown = document.getElementById('gaam-filter');
+            gaamDropdown.value = 'ઉવારસદ';
+            gaamDropdown.dispatchEvent(new Event('change'));
+            
+            // Verify gaam is set
+            const gaamSetBefore = galleryState.filterState.selectedGaam === 'ઉવારસદ';
+            
+            // Click clear filters
+            document.getElementById('clear-filters').click();
+            
+            // Verify gaam dropdown is reset
+            const dropdownReset = gaamDropdown.value === '';
+            const stateCleared = galleryState.filterState.selectedGaam === null;
+            
+            const passed = gaamSetBefore && dropdownReset && stateCleared;
+            addTestResult('Test 2: Clear Gaam Only', passed, 
+                `Gaam was set: ${gaamSetBefore}, Dropdown reset: ${dropdownReset}, State cleared: ${stateCleared}`);
+        }
+
+        function runTest3() {
+            // Test 3: Clear Both Filters
+            document.getElementById('test-results').innerHTML = '';
+            
+            // Set up: Select both filters
+            const talukoDropdown = document.getElementById('taluko-filter');
+            const gaamDropdown = document.getElementById('gaam-filter');
+            
+            talukoDropdown.value = 'ગાંધીનગર';
+            talukoDropdown.dispatchEvent(new Event('change'));
+            gaamDropdown.value = 'ઉવારસદ';
+            gaamDropdown.dispatchEvent(new Event('change'));
+            
+            // Verify both are set
+            const bothSetBefore = galleryState.filterState.selectedTaluko === 'ગાંધીનગર' &&
+                                  galleryState.filterState.selectedGaam === 'ઉવારસદ';
+            
+            // Click clear filters
+            document.getElementById('clear-filters').click();
+            
+            // Verify both dropdowns are reset
+            const talukoReset = talukoDropdown.value === '';
+            const gaamReset = gaamDropdown.value === '';
+            const talukoStateCleared = galleryState.filterState.selectedTaluko === null;
+            const gaamStateCleared = galleryState.filterState.selectedGaam === null;
+            
+            const passed = bothSetBefore && talukoReset && gaamReset && 
+                          talukoStateCleared && gaamStateCleared;
+            addTestResult('Test 3: Clear Both Filters', passed, 
+                `Both set: ${bothSetBefore}, Dropdowns reset: ${talukoReset && gaamReset}, State cleared: ${talukoStateCleared && gaamStateCleared}`);
+        }
+
+        function runTest4() {
+            // Test 4: Maintain Search Text
+            document.getElementById('test-results').innerHTML = '';
+            
+            // Set up: Set search text and filters
+            const searchInput = document.getElementById('search-input');
+            searchInput.value = 'P064';
+            searchInput.dispatchEvent(new Event('input'));
+            
+            const talukoDropdown = document.getElementById('taluko-filter');
+            talukoDropdown.value = 'ગાંધીનગર';
+            talukoDropdown.dispatchEvent(new Event('change'));
+            
+            const searchTextBefore = galleryState.searchTerm;
+            
+            // Click clear filters
+            document.getElementById('clear-filters').click();
+            
+            // Verify search text is maintained
+            const searchTextAfter = galleryState.searchTerm;
+            const searchInputValue = searchInput.value;
+            
+            const passed = searchTextBefore === 'p064' && 
+                          searchTextAfter === 'p064' && 
+                          searchInputValue === 'P064';
+            addTestResult('Test 4: Maintain Search Text', passed, 
+                `Search before: "${searchTextBefore}", Search after: "${searchTextAfter}", Input value: "${searchInputValue}"`);
+        }
+
+        function runTest5() {
+            // Test 5: Trigger Display Update
+            document.getElementById('test-results').innerHTML = '';
+            
+            // Set up: Select a filter to reduce results
+            const talukoDropdown = document.getElementById('taluko-filter');
+            talukoDropdown.value = 'ગાંધીનગર';
+            talukoDropdown.dispatchEvent(new Event('change'));
+            
+            const filteredCountBefore = galleryState.filteredImages.length;
+            
+            // Click clear filters
+            document.getElementById('clear-filters').click();
+            
+            const filteredCountAfter = galleryState.filteredImages.length;
+            const allImagesCount = galleryState.allImages.length;
+            
+            // After clearing, should show all images
+            const passed = filteredCountBefore < allImagesCount && 
+                          filteredCountAfter === allImagesCount;
+            addTestResult('Test 5: Trigger Display Update', passed, 
+                `Filtered before: ${filteredCountBefore}, Filtered after: ${filteredCountAfter}, Total: ${allImagesCount}`);
+        }
+
+        function runAllTests() {
+            document.getElementById('test-results').innerHTML = '';
+            setTimeout(() => runTest1(), 100);
+            setTimeout(() => runTest2(), 300);
+            setTimeout(() => runTest3(), 500);
+            setTimeout(() => runTest4(), 700);
+            setTimeout(() => runTest5(), 900);
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initializeMockData);
+    </script>
+</body>
+</html>

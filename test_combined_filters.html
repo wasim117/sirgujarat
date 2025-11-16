@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined Filter Logic Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Combined Filter Logic Test</h1>
+    <p>This page tests the combined filter application logic (Task 7)</p>
+
+    <div class="test-section">
+        <h3>Test 1: Location Filter Only (Taluko)</h3>
+        <button onclick="testTalukoFilter()">Run Test</button>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Location Filter Only (Gaam)</h3>
+        <button onclick="testGaamFilter()">Run Test</button>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Combined Location Filters (Taluko + Gaam)</h3>
+        <button onclick="testCombinedLocationFilters()">Run Test</button>
+        <div id="test3-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 4: Location Filter + Search Term</h3>
+        <button onclick="testLocationAndSearch()">Run Test</button>
+        <div id="test4-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 5: Document ID Mapping</h3>
+        <button onclick="testDocumentMapping()">Run Test</button>
+        <div id="test5-result"></div>
+    </div>
+
+    <script>
+        // Mock gallery state for testing
+        let galleryState = {
+            allImages: [
+                'P0640001.jpg', 'P0640002.jpg', 'P0640003.jpg',
+                'P0640004.jpg', 'P0640005.jpg'
+            ],
+            filteredImages: [],
+            imageMetadata: {
+                'P0640001.jpg': { documentNumber: 'P064-0001' },
+                'P0640002.jpg': { documentNumber: 'P064-0002' },
+                'P0640003.jpg': { documentNumber: 'P064-0003' },
+                'P0640004.jpg': { documentNumber: 'P064-0004' },
+                'P0640005.jpg': { documentNumber: 'P064-0005' }
+            },
+            searchTerm: '',
+            filterState: {
+                selectedTaluko: null,
+                selectedGaam: null,
+                locationData: {
+                    'P0640001': { taluko: 'ગાંધીનગર', gaam: 'ઉવારસદ' },
+                    'P0640002': { taluko: 'ગાંધીનગર', gaam: 'ઉવારસદ' },
+                    'P0640003': { taluko: 'ગાંધીનગર', gaam: 'સરગાસણ' },
+                    'P0640004': { taluko: 'દસક્રોઈ', gaam: 'શેરથા' },
+                    'P0640005': { taluko: 'દસક્રોઈ', gaam: 'શેરથા' }
+                }
+            }
+        };
+
+        // Simplified filterImages function for testing
+        function filterImages(searchTerm) {
+            galleryState.searchTerm = searchTerm.toLowerCase();
+            let filtered = [...galleryState.allImages];
+            
+            const { selectedTaluko, selectedGaam, locationData } = galleryState.filterState;
+            
+            // Apply location filters
+            if (selectedTaluko || selectedGaam) {
+                filtered = filtered.filter((filename) => {
+                    const docId = filename.replace('.jpg', '');
+                    const location = locationData[docId];
+                    
+                    if (!location) return false;
+                    if (selectedTaluko && location.taluko !== selectedTaluko) return false;
+                    if (selectedGaam && location.gaam !== selectedGaam) return false;
+                    
+                    return true;
+                });
+            }
+            
+            // Apply search term filter
+            if (galleryState.searchTerm) {
+                filtered = filtered.filter((filename) => {
+                    const metadata = galleryState.imageMetadata[filename];
+                    return (
+                        filename.toLowerCase().includes(galleryState.searchTerm) ||
+                        metadata.documentNumber.toLowerCase().includes(galleryState.searchTerm)
+                    );
+                });
+            }
+            
+            galleryState.filteredImages = filtered;
+            return filtered;
+        }
+
+        function resetFilters() {
+            galleryState.filterState.selectedTaluko = null;
+            galleryState.filterState.selectedGaam = null;
+            galleryState.searchTerm = '';
+        }
+
+        function testTalukoFilter() {
+            resetFilters();
+            const resultDiv = document.getElementById('test1-result');
+            
+            galleryState.filterState.selectedTaluko = 'ગાંધીનગર';
+            const result = filterImages('');
+            
+            const expected = ['P0640001.jpg', 'P0640002.jpg', 'P0640003.jpg'];
+            const passed = JSON.stringify(result) === JSON.stringify(expected);
+            
+            resultDiv.innerHTML = `
+                <div class="result ${passed ? 'success' : 'error'}">
+                    <strong>${passed ? 'PASS' : 'FAIL'}</strong><br>
+                    Expected: ${expected.length} images (${expected.join(', ')})<br>
+                    Got: ${result.length} images (${result.join(', ')})
+                </div>
+            `;
+        }
+
+        function testGaamFilter() {
+            resetFilters();
+            const resultDiv = document.getElementById('test2-result');
+            
+            galleryState.filterState.selectedGaam = 'શેરથા';
+            const result = filterImages('');
+            
+            const expected = ['P0640004.jpg', 'P0640005.jpg'];
+            const passed = JSON.stringify(result) === JSON.stringify(expected);
+            
+            resultDiv.innerHTML = `
+                <div class="result ${passed ? 'success' : 'error'}">
+                    <strong>${passed ? 'PASS' : 'FAIL'}</strong><br>
+                    Expected: ${expected.length} images (${expected.join(', ')})<br>
+                    Got: ${result.length} images (${result.join(', ')})
+                </div>
+            `;
+        }
+
+        function testCombinedLocationFilters() {
+            resetFilters();
+            const resultDiv = document.getElementById('test3-result');
+            
+            galleryState.filterState.selectedTaluko = 'ગાંધીનગર';
+            galleryState.filterState.selectedGaam = 'ઉવારસદ';
+            const result = filterImages('');
+            
+            const expected = ['P0640001.jpg', 'P0640002.jpg'];
+            const passed = JSON.stringify(result) === JSON.stringify(expected);
+            
+            resultDiv.innerHTML = `
+                <div class="result ${passed ? 'success' : 'error'}">
+                    <strong>${passed ? 'PASS' : 'FAIL'}</strong><br>
+                    Expected: ${expected.length} images (${expected.join(', ')})<br>
+                    Got: ${result.length} images (${result.join(', ')})
+                </div>
+            `;
+        }
+
+        function testLocationAndSearch() {
+            resetFilters();
+            const resultDiv = document.getElementById('test4-result');
+            
+            galleryState.filterState.selectedTaluko = 'ગાંધીનગર';
+            const result = filterImages('0001');
+            
+            const expected = ['P0640001.jpg'];
+            const passed = JSON.stringify(result) === JSON.stringify(expected);
+            
+            resultDiv.innerHTML = `
+                <div class="result ${passed ? 'success' : 'error'}">
+                    <strong>${passed ? 'PASS' : 'FAIL'}</strong><br>
+                    Expected: ${expected.length} images (${expected.join(', ')})<br>
+                    Got: ${result.length} images (${result.join(', ')})<br>
+                    <em>Testing: Taluko filter + search term "0001"</em>
+                </div>
+            `;
+        }
+
+        function testDocumentMapping() {
+            resetFilters();
+            const resultDiv = document.getElementById('test5-result');
+            
+            const testCases = [
+                { filename: 'P0640001.jpg', expectedDocId: 'P0640001' },
+                { filename: 'P0640123.jpg', expectedDocId: 'P0640123' }
+            ];
+            
+            let allPassed = true;
+            let details = '';
+            
+            testCases.forEach(test => {
+                const docId = test.filename.replace('.jpg', '');
+                const passed = docId === test.expectedDocId;
+                allPassed = allPassed && passed;
+                details += `${test.filename} → ${docId} (${passed ? 'PASS' : 'FAIL'})<br>`;
+            });
+            
+            resultDiv.innerHTML = `
+                <div class="result ${allPassed ? 'success' : 'error'}">
+                    <strong>${allPassed ? 'PASS' : 'FAIL'}</strong><br>
+                    ${details}
+                </div>
+            `;
+        }
+
+        // Run all tests on load
+        window.addEventListener('load', () => {
+            document.getElementById('test1-result').innerHTML = '<div class="result info">Click "Run Test" to execute</div>';
+            document.getElementById('test2-result').innerHTML = '<div class="result info">Click "Run Test" to execute</div>';
+            document.getElementById('test3-result').innerHTML = '<div class="result info">Click "Run Test" to execute</div>';
+            document.getElementById('test4-result').innerHTML = '<div class="result info">Click "Run Test" to execute</div>';
+            document.getElementById('test5-result').innerHTML = '<div class="result info">Click "Run Test" to execute</div>';
+        });
+    </script>
+</body>
+</html>

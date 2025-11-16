@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Gallery Initialization Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-passed {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .test-failed {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .test-pending {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .status {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        .filter-dropdown {
+            padding: 8px;
+            margin: 5px;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gallery Initialization Integration Test</h1>
+    <p>This test verifies that all initialization steps work together correctly.</p>
+    
+    <div id="test-results"></div>
+    
+    <!-- Mock filter UI elements -->
+    <div style="display: none;">
+        <select id="taluko-filter"></select>
+        <select id="gaam-filter"></select>
+        <button id="clear-filters"></button>
+    </div>
+    
+    <script>
+        // Mock gallery state
+        let galleryState = {
+            allImages: [],
+            filteredImages: [],
+            imageMetadata: {},
+            searchTerm: '',
+            filterState: {
+                selectedTaluko: null,
+                selectedGaam: null,
+                availableTalukos: [],
+                availableGaams: [],
+                locationData: {}
+            }
+        };
+        
+        // Test results
+        const testResults = {
+            imageListLoaded: false,
+            locationDataLoaded: false,
+            talukoDropdownPopulated: false,
+            gaamDropdownPopulated: false,
+            statisticsUpdated: false,
+            errorHandlingWorks: false
+        };
+        
+        // Mock functions from script.js
+        async function fetchImageList() {
+            try {
+                const imageCount = 601;
+                const images = [];
+                
+                for (let i = 1; i <= imageCount; i++) {
+                    const paddedNumber = String(i).padStart(4, '0');
+                    const filename = `P064${paddedNumber}.jpg`;
+                    images.push(filename);
+                }
+                
+                galleryState.allImages = images;
+                galleryState.filteredImages = [...images];
+                
+                console.log(`✓ Loaded ${images.length} images`);
+                testResults.imageListLoaded = true;
+                return true;
+            } catch (error) {
+                console.error('✗ Failed to fetch image list:', error);
+                return false;
+            }
+        }
+        
+        async function loadLocationData() {
+            try {
+                console.log('Loading location data from extracted_data.json...');
+                
+                const response = await fetch('extracted_data.json');
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch location data: ${response.status} ${response.statusText}`);
+                }
+                
+                const locationData = await response.json();
+                
+                if (!locationData || typeof locationData !== 'object') {
+                    throw new Error('Invalid location data format: expected an object');
+                }
+                
+                galleryState.filterState.locationData = locationData;
+                
+                const talukos = new Set();
+                const gaams = new Set();
+                
+                Object.entries(locationData).forEach(([docId, entry]) => {
+                    if (entry && entry.taluko) {
+                        talukos.add(entry.taluko);
+                    }
+                    if (entry && entry.gaam) {
+                        gaams.add(entry.gaam);
+                    }
+                });
+                
+                galleryState.filterState.availableTalukos = Array.from(talukos).sort();
+                galleryState.filterState.availableGaams = Array.from(gaams).sort();
+                
+                console.log(`✓ Location data loaded successfully:`);
+                console.log(`  - ${Object.keys(locationData).length} documents`);
+                console.log(`  - ${galleryState.filterState.availableTalukos.length} unique talukos`);
+                console.log(`  - ${galleryState.filterState.availableGaams.length} unique gaams`);
+                
+                testResults.locationDataLoaded = true;
+                return true;
+            } catch (error) {
+                console.error('✗ Failed to load location data:', error);
+                testResults.errorHandlingWorks = true; // Error was caught gracefully
+                return false;
+            }
+        }
+        
+        function populateTalukoDropdown() {
+            const talukoDropdown = document.getElementById('taluko-filter');
+            
+            if (!talukoDropdown) {
+                console.error('✗ Taluko dropdown element not found');
+                return false;
+            }
+            
+            talukoDropdown.innerHTML = '<option value="">Select Taluko</option>';
+            
+            const talukos = galleryState.filterState.availableTalukos;
+            
+            talukos.forEach((taluko) => {
+                const option = document.createElement('option');
+                option.value = taluko;
+                option.textContent = taluko;
+                talukoDropdown.appendChild(option);
+            });
+            
+            console.log(`✓ Taluko dropdown populated with ${talukos.length} options`);
+            testResults.talukoDropdownPopulated = talukoDropdown.options.length > 1;
+            return true;
+        }
+        
+        function populateGaamDropdown(selectedTaluko = null) {
+            const gaamDropdown = document.getElementById('gaam-filter');
+            
+            if (!gaamDropdown) {
+                console.error('✗ Gaam dropdown element not found');
+                return false;
+            }
+            
+            gaamDropdown.innerHTML = '<option value="">Select Gaam</option>';
+            
+            let gaamsToDisplay = [];
+            
+            if (selectedTaluko) {
+                const locationData = galleryState.filterState.locationData;
+                const gaamSet = new Set();
+                
+                Object.values(locationData).forEach((entry) => {
+                    if (entry && entry.taluko === selectedTaluko && entry.gaam) {
+                        gaamSet.add(entry.gaam);
+                    }
+                });
+                
+                gaamsToDisplay = Array.from(gaamSet).sort();
+            } else {
+                gaamsToDisplay = galleryState.filterState.availableGaams;
+            }
+            
+            gaamsToDisplay.forEach((gaam) => {
+                const option = document.createElement('option');
+                option.value = gaam;
+                option.textContent = gaam;
+                gaamDropdown.appendChild(option);
+            });
+            
+            console.log(`✓ Gaam dropdown populated with ${gaamsToDisplay.length} options`);
+            testResults.gaamDropdownPopulated = gaamDropdown.options.length > 1;
+            return true;
+        }
+        
+        function updateStatistics() {
+            const { availableTalukos, availableGaams, locationData } = galleryState.filterState;
+            const hasLocationData = Object.keys(locationData).length > 0;
+            
+            if (hasLocationData) {
+                console.log('✓ Statistics updated with filter availability:', {
+                    totalDocuments: galleryState.allImages.length,
+                    documentsWithLocation: Object.keys(locationData).length,
+                    availableTalukos: availableTalukos.length,
+                    availableGaams: availableGaams.length
+                });
+                testResults.statisticsUpdated = true;
+            } else {
+                console.log('✓ Statistics updated (no location data)');
+                testResults.statisticsUpdated = true;
+            }
+        }
+        
+        // Main initialization test (mimics initializeGallery)
+        async function testInitialization() {
+            console.log('=== Starting Gallery Initialization Test ===');
+            
+            try {
+                // Step 1: Fetch image list
+                console.log('\n[Step 1] Fetching image list...');
+                await fetchImageList();
+                
+                // Step 2: Load location data
+                console.log('\n[Step 2] Loading location data...');
+                const locationDataLoaded = await loadLocationData();
+                
+                if (locationDataLoaded) {
+                    console.log('[Step 2] Location data loaded successfully');
+                    
+                    // Step 3: Populate filter dropdowns
+                    console.log('\n[Step 3] Populating filter dropdowns...');
+                    populateTalukoDropdown();
+                    populateGaamDropdown();
+                } else {
+                    console.warn('[Step 2] Location data failed to load, filters disabled');
+                    console.log('[Step 3] Skipping filter dropdown population');
+                }
+                
+                // Step 4: Update statistics
+                console.log('\n[Step 4] Updating statistics...');
+                updateStatistics();
+                
+                console.log('\n=== Gallery Initialization Test Complete ===');
+                
+                return true;
+            } catch (error) {
+                console.error('=== Gallery Initialization Test Failed ===');
+                console.error('Error:', error);
+                return false;
+            }
+        }
+        
+        // Display test results
+        function displayResults() {
+            const resultsDiv = document.getElementById('test-results');
+            
+            const allPassed = Object.values(testResults).every(result => result === true);
+            
+            let html = '';
+            
+            // Overall status
+            html += `<div class="test-section ${allPassed ? 'test-passed' : 'test-failed'}">`;
+            html += `<h2>Overall Status</h2>`;
+            html += `<p class="status">${allPassed ? '✓ All Tests Passed' : '✗ Some Tests Failed'}</p>`;
+            html += `</div>`;
+            
+            // Individual test results
+            html += `<div class="test-section">`;
+            html += `<h2>Test Results</h2>`;
+            html += `<ul>`;
+            html += `<li>${testResults.imageListLoaded ? '✓' : '✗'} Image list loaded (${galleryState.allImages.length} images)</li>`;
+            html += `<li>${testResults.locationDataLoaded ? '✓' : '✗'} Location data loaded (${Object.keys(galleryState.filterState.locationData).length} documents)</li>`;
+            html += `<li>${testResults.talukoDropdownPopulated ? '✓' : '✗'} Taluko dropdown populated (${galleryState.filterState.availableTalukos.length} options)</li>`;
+            html += `<li>${testResults.gaamDropdownPopulated ? '✓' : '✗'} Gaam dropdown populated (${galleryState.filterState.availableGaams.length} options)</li>`;
+            html += `<li>${testResults.statisticsUpdated ? '✓' : '✗'} Statistics updated with filter availability</li>`;
+            html += `</ul>`;
+            html += `</div>`;
+            
+            // Filter statistics
+            if (testResults.locationDataLoaded) {
+                html += `<div class="test-section test-passed">`;
+                html += `<h2>Filter Statistics</h2>`;
+                html += `<p><strong>Total Documents:</strong> ${galleryState.allImages.length}</p>`;
+                html += `<p><strong>Documents with Location Data:</strong> ${Object.keys(galleryState.filterState.locationData).length}</p>`;
+                html += `<p><strong>Available Talukos:</strong> ${galleryState.filterState.availableTalukos.length}</p>`;
+                html += `<p><strong>Available Gaams:</strong> ${galleryState.filterState.availableGaams.length}</p>`;
+                html += `<h3>Sample Talukos:</h3>`;
+                html += `<pre>${JSON.stringify(galleryState.filterState.availableTalukos.slice(0, 5), null, 2)}</pre>`;
+                html += `<h3>Sample Gaams:</h3>`;
+                html += `<pre>${JSON.stringify(galleryState.filterState.availableGaams.slice(0, 5), null, 2)}</pre>`;
+                html += `</div>`;
+            }
+            
+            // Dropdown preview
+            html += `<div class="test-section">`;
+            html += `<h2>Dropdown Preview</h2>`;
+            html += `<p><strong>Taluko Dropdown:</strong></p>`;
+            html += `<select class="filter-dropdown" id="taluko-preview"></select>`;
+            html += `<p><strong>Gaam Dropdown:</strong></p>`;
+            html += `<select class="filter-dropdown" id="gaam-preview"></select>`;
+            html += `</div>`;
+            
+            resultsDiv.innerHTML = html;
+            
+            // Copy dropdown contents to preview
+            const talukoDropdown = document.getElementById('taluko-filter');
+            const gaamDropdown = document.getElementById('gaam-filter');
+            const talukoPreview = document.getElementById('taluko-preview');
+            const gaamPreview = document.getElementById('gaam-preview');
+            
+            if (talukoDropdown && talukoPreview) {
+                talukoPreview.innerHTML = talukoDropdown.innerHTML;
+            }
+            if (gaamDropdown && gaamPreview) {
+                gaamPreview.innerHTML = gaamDropdown.innerHTML;
+            }
+        }
+        
+        // Run test on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="test-section test-pending"><h2>Running Tests...</h2><p>Please wait...</p></div>';
+            
+            await testInitialization();
+            displayResults();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cascading Dropdown Behavior</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .filter-container {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-width: 200px;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        #gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .image-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .image-card.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Cascading Dropdown Behavior</h1>
+    
+    <div class="test-section">
+        <h2>Filter Controls</h2>
+        <div class="filter-container">
+            <div class="filter-group">
+                <label for="taluko-filter">Taluko (District):</label>
+                <select id="taluko-filter">
+                    <option value="">Select Taluko</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="gaam-filter">Gaam (Village):</label>
+                <select id="gaam-filter">
+                    <option value="">Select Gaam</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="status info">
+            <strong>Instructions:</strong>
+            <ol>
+                <li>Select a Taluko from the first dropdown</li>
+                <li>Observe that the Gaam dropdown updates to show only villages in that Taluko</li>
+                <li>Observe that the Gaam selection is reset when Taluko changes</li>
+                <li>Check the console for filter application logs</li>
+            </ol>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Current Filter State</h2>
+        <div id="filter-state" class="status">
+            <div><strong>Selected Taluko:</strong> <span id="current-taluko">None</span></div>
+            <div><strong>Selected Gaam:</strong> <span id="current-gaam">None</span></div>
+            <div><strong>Available Gaams Count:</strong> <span id="gaam-count">0</span></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Search and Gallery</h2>
+        <input type="text" id="search-input" placeholder="Search..." style="padding: 8px; width: 300px;">
+        <button id="clear-search">Clear</button>
+        <div id="result-count" style="margin: 10px 0;">0 results</div>
+        <div id="gallery-grid"></div>
+        <div id="no-results" style="display: none;">No results found</div>
+        <div id="loading" style="display: none;">Loading...</div>
+    </div>
+    
+    <div style="display: none;">
+        <div id="total-documents">0</div>
+        <div id="last-updated">-</div>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        // Test script to verify cascading behavior
+        let testResults = [];
+        
+        function addTestResult(test, passed, message) {
+            testResults.push({ test, passed, message });
+            updateTestDisplay();
+        }
+        
+        function updateTestDisplay() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = testResults.map(result => `
+                <div class="status ${result.passed ? 'success' : 'error'}">
+                    <strong>${result.test}:</strong> ${result.passed ? '✓ PASS' : '✗ FAIL'} - ${result.message}
+                </div>
+            `).join('');
+        }
+        
+        function updateFilterStateDisplay() {
+            document.getElementById('current-taluko').textContent = 
+                galleryState.filterState.selectedTaluko || 'None';
+            document.getElementById('current-gaam').textContent = 
+                galleryState.filterState.selectedGaam || 'None';
+            
+            const gaamDropdown = document.getElementById('gaam-filter');
+            const gaamCount = gaamDropdown.options.length - 1; // Exclude default option
+            document.getElementById('gaam-count').textContent = gaamCount;
+        }
+        
+        // Wait for gallery to initialize
+        setTimeout(() => {
+            console.log('Starting cascading dropdown tests...');
+            
+            // Test 1: Check if dropdowns are populated
+            const talukoDropdown = document.getElementById('taluko-filter');
+            const gaamDropdown = document.getElementById('gaam-filter');
+            
+            const talukoCount = talukoDropdown.options.length - 1;
+            const initialGaamCount = gaamDropdown.options.length - 1;
+            
+            addTestResult(
+                'Dropdown Population',
+                talukoCount > 0 && initialGaamCount > 0,
+                `Taluko: ${talukoCount} options, Gaam: ${initialGaamCount} options`
+            );
+            
+            // Test 2: Select a taluko and verify gaam dropdown updates
+            if (talukoCount > 0) {
+                const firstTaluko = talukoDropdown.options[1].value;
+                talukoDropdown.value = firstTaluko;
+                talukoDropdown.dispatchEvent(new Event('change'));
+                
+                setTimeout(() => {
+                    const filteredGaamCount = gaamDropdown.options.length - 1;
+                    const gaamReset = gaamDropdown.value === '';
+                    
+                    addTestResult(
+                        'Cascading Behavior',
+                        filteredGaamCount > 0 && filteredGaamCount <= initialGaamCount,
+                        `Gaam dropdown updated to ${filteredGaamCount} options (filtered from ${initialGaamCount})`
+                    );
+                    
+                    addTestResult(
+                        'Gaam Reset on Taluko Change',
+                        gaamReset,
+                        gaamReset ? 'Gaam selection was reset' : 'Gaam selection was NOT reset'
+                    );
+                    
+                    updateFilterStateDisplay();
+                    
+                    // Test 3: Select a gaam and verify state
+                    if (filteredGaamCount > 0) {
+                        const firstGaam = gaamDropdown.options[1].value;
+                        gaamDropdown.value = firstGaam;
+                        gaamDropdown.dispatchEvent(new Event('change'));
+                        
+                        setTimeout(() => {
+                            const stateUpdated = galleryState.filterState.selectedGaam === firstGaam;
+                            addTestResult(
+                                'Gaam Selection',
+                                stateUpdated,
+                                stateUpdated ? 'Gaam state updated correctly' : 'Gaam state NOT updated'
+                            );
+                            
+                            updateFilterStateDisplay();
+                            
+                            // Test 4: Change taluko again and verify gaam resets
+                            if (talukoCount > 1) {
+                                const secondTaluko = talukoDropdown.options[2].value;
+                                talukoDropdown.value = secondTaluko;
+                                talukoDropdown.dispatchEvent(new Event('change'));
+                                
+                                setTimeout(() => {
+                                    const gaamResetAgain = gaamDropdown.value === '';
+                                    const stateCleared = galleryState.filterState.selectedGaam === null;
+                                    
+                                    addTestResult(
+                                        'Gaam Reset on Second Taluko Change',
+                                        gaamResetAgain && stateCleared,
+                                        `Dropdown reset: ${gaamResetAgain}, State cleared: ${stateCleared}`
+                                    );
+                                    
+                                    updateFilterStateDisplay();
+                                }, 100);
+                            }
+                        }, 100);
+                    }
+                }, 100);
+            }
+        }, 2000);
+        
+        // Update display whenever filters change
+        setInterval(updateFilterStateDisplay, 500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Taluko Dropdown Population</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        select {
+            padding: 8px;
+            font-size: 14px;
+            width: 100%;
+            max-width: 400px;
+        }
+        #results {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Taluko Dropdown Population Test</h1>
+    
+    <div class="test-section">
+        <h2>Taluko Dropdown</h2>
+        <label for="taluko-filter">Taluko (District):</label>
+        <select id="taluko-filter">
+            <option value="">Select Taluko</option>
+        </select>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        // Minimal state management for testing
+        let galleryState = {
+            filterState: {
+                availableTalukos: [],
+                locationData: {}
+            }
+        };
+        
+        // Load location data
+        async function loadLocationData() {
+            try {
+                const response = await fetch('extracted_data.json');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch: ${response.status}`);
+                }
+                
+                const locationData = await response.json();
+                galleryState.filterState.locationData = locationData;
+                
+                // Extract unique talukos
+                const talukos = new Set();
+                Object.values(locationData).forEach((entry) => {
+                    if (entry.taluko) {
+                        talukos.add(entry.taluko);
+                    }
+                });
+                
+                // Sort alphabetically
+                galleryState.filterState.availableTalukos = Array.from(talukos).sort();
+                
+                return true;
+            } catch (error) {
+                console.error('Failed to load location data:', error);
+                return false;
+            }
+        }
+        
+        // Populate taluko dropdown
+        function populateTalukoDropdown() {
+            const talukoDropdown = document.getElementById('taluko-filter');
+            
+            if (!talukoDropdown) {
+                console.error('Taluko dropdown element not found');
+                return;
+            }
+            
+            // Clear existing options except the default one
+            talukoDropdown.innerHTML = '<option value="">Select Taluko</option>';
+            
+            // Get unique taluko values from state (already sorted alphabetically)
+            const talukos = galleryState.filterState.availableTalukos;
+            
+            // Create and append option elements for each taluko
+            talukos.forEach((taluko) => {
+                const option = document.createElement('option');
+                option.value = taluko;
+                option.textContent = taluko;
+                talukoDropdown.appendChild(option);
+            });
+            
+            console.log(`Populated taluko dropdown with ${talukos.length} options`);
+        }
+        
+        // Run test
+        async function runTest() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.textContent = 'Loading location data...\n';
+            
+            const success = await loadLocationData();
+            
+            if (!success) {
+                resultsDiv.textContent += 'ERROR: Failed to load location data\n';
+                return;
+            }
+            
+            resultsDiv.textContent += `✓ Location data loaded successfully\n`;
+            resultsDiv.textContent += `✓ Found ${Object.keys(galleryState.filterState.locationData).length} documents\n`;
+            resultsDiv.textContent += `✓ Extracted ${galleryState.filterState.availableTalukos.length} unique talukos\n\n`;
+            
+            // Populate dropdown
+            populateTalukoDropdown();
+            
+            // Verify dropdown
+            const dropdown = document.getElementById('taluko-filter');
+            const optionCount = dropdown.options.length - 1; // Exclude default option
+            
+            resultsDiv.textContent += `✓ Dropdown populated with ${optionCount} options\n\n`;
+            resultsDiv.textContent += 'Taluko values (sorted alphabetically):\n';
+            
+            galleryState.filterState.availableTalukos.forEach((taluko, index) => {
+                resultsDiv.textContent += `  ${index + 1}. ${taluko}\n`;
+            });
+            
+            // Verify sorting
+            const isSorted = galleryState.filterState.availableTalukos.every((val, i, arr) => 
+                i === 0 || arr[i - 1].localeCompare(val) <= 0
+            );
+            
+            resultsDiv.textContent += `\n✓ Values are sorted: ${isSorted}\n`;
+            
+            // Mark test section as success
+            document.querySelector('.test-section').classList.add('success');
+        }
+        
+        // Run test on page load
+        document.addEventListener('DOMContentLoaded', runTest);
+    </script>
+</body>
+</html>

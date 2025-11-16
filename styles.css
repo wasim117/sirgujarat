@@ -151,6 +151,114 @@ button {
     font-size: 0.9rem;
     color: #666;
     font-weight: 500;
+    line-height: 1.5;
+}
+
+/* Highlight result count when filters are active */
+.result-count.has-filters {
+    color: #007bff;
+    font-weight: 600;
+}
+
+/* ============================================
+   Filter Component Styles
+   ============================================ */
+
+.filter-container {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.filter-dropdown {
+    padding: 0.75rem 1rem;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: inherit;
+}
+
+.filter-dropdown:hover {
+    border-color: #999;
+}
+
+.filter-dropdown:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Active filter indicator - when a value is selected */
+.filter-dropdown:not([value=""]):valid,
+.filter-dropdown.active,
+.filter-dropdown.filter-active {
+    border-color: #007bff;
+    background-color: #f0f8ff;
+    font-weight: 600;
+}
+
+/* Visual indicator when filters are active */
+.filter-container.has-active-filters {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.filter-container.has-active-filters .clear-filters-button {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.filter-container.has-active-filters .clear-filters-button:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.clear-filters-button {
+    padding: 0.75rem 1.5rem;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    align-self: flex-end;
+    white-space: nowrap;
+}
+
+.clear-filters-button:hover {
+    background-color: #e0e0e0;
+    border-color: #999;
+}
+
+.clear-filters-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.clear-filters-button:active {
+    background-color: #d0d0d0;
 }
 
 /* ============================================
@@ -279,6 +387,7 @@ button {
 }
 
 .pdf-link-button {
+    width: 100%;
     padding: 0.75rem 1.5rem;
     background-color: #007bff;
     color: white;
@@ -286,16 +395,27 @@ button {
     font-weight: 600;
     font-size: 0.95rem;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .pdf-link-button:hover {
     background-color: #0056b3;
-    transform: scale(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
 }
 
 .pdf-link-button:focus {
-    outline: 2px solid white;
+    outline: 2px solid #007bff;
     outline-offset: 2px;
+}
+
+.pdf-link-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
 
 .pdf-link-button:disabled {
@@ -393,6 +513,106 @@ button {
     font-size: 1.1rem;
 }
 
+.no-results strong {
+    color: #333;
+    font-size: 1.3rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.no-results ul.filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem auto;
+    max-width: 400px;
+    text-align: left;
+}
+
+.no-results ul.filter-list li {
+    padding: 0.5rem 1rem;
+    background-color: #f8f9fa;
+    border-left: 3px solid #007bff;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+}
+
+.no-results em {
+    font-style: normal;
+    font-weight: 600;
+    color: #007bff;
+}
+
+.inline-clear-button {
+    display: inline;
+    padding: 0.25rem 0.75rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border: none;
+}
+
+.inline-clear-button:hover {
+    background-color: #0056b3;
+}
+
+.inline-clear-button:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* ============================================
+   Filter Error State Styles
+   ============================================ */
+
+.filter-container.filter-error {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.filter-error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background-color: #fff;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    border-left: 3px solid #ffc107;
+}
+
+.filter-error-message .error-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.filter-error-message .error-text {
+    font-size: 0.9rem;
+    color: #856404;
+    font-weight: 500;
+}
+
+.filter-dropdown.filter-disabled,
+.clear-filters-button.filter-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f0f0f0;
+}
+
+.filter-dropdown.filter-disabled:hover {
+    border-color: #ddd;
+}
+
+.clear-filters-button.filter-disabled:hover {
+    background-color: #f0f0f0;
+    border-color: #ddd;
+}
+
 /* ============================================
    Footer Styles
    ============================================ */
@@ -468,6 +688,28 @@ button {
     .clear-button {
         width: 100%;
         padding: 0.75rem;
+    }
+
+    /* Filter component responsive styles */
+    .filter-container {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .filter-group {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .filter-dropdown {
+        width: 100%;
+        padding: 0.75rem;
+    }
+
+    .clear-filters-button {
+        width: 100%;
+        padding: 0.75rem;
+        align-self: stretch;
     }
 
     .main-content {
@@ -628,8 +870,18 @@ button {
         color: #666;
     }
 
+    .pdf-link-button {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .pdf-link-button:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+    }
+
     .pdf-link-button:focus {
-        outline-color: #e0e0e0;
+        outline-color: #4da3ff;
     }
 
     .footer {
@@ -640,5 +892,115 @@ button {
 
     .no-results {
         color: #999;
+    }
+
+    /* Filter component dark mode styles */
+    .filter-group label {
+        color: #e0e0e0;
+    }
+
+    .filter-dropdown {
+        background-color: #333;
+        color: #e0e0e0;
+        border-color: #555;
+    }
+
+    .filter-dropdown:hover {
+        border-color: #666;
+    }
+
+    .filter-dropdown:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+
+    .filter-dropdown.active,
+    .filter-dropdown.filter-active,
+    .filter-dropdown:not([value=""]):valid {
+        border-color: #007bff;
+        background-color: #1a3a52;
+        font-weight: 600;
+    }
+
+    /* Visual indicator when filters are active in dark mode */
+    .filter-container.has-active-filters {
+        background-color: #2a2a2a;
+        border-color: #444;
+    }
+
+    .filter-container.has-active-filters .clear-filters-button {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .filter-container.has-active-filters .clear-filters-button:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    /* Highlight result count when filters are active in dark mode */
+    .result-count.has-filters {
+        color: #4da3ff;
+        font-weight: 600;
+    }
+
+    .clear-filters-button {
+        background-color: #333;
+        border-color: #555;
+        color: #e0e0e0;
+    }
+
+    .clear-filters-button:hover {
+        background-color: #444;
+        border-color: #666;
+    }
+
+    .clear-filters-button:active {
+        background-color: #555;
+    }
+
+    /* No results dark mode styles */
+    .no-results strong {
+        color: #e0e0e0;
+    }
+
+    .no-results ul.filter-list li {
+        background-color: #2a2a2a;
+        border-left-color: #4da3ff;
+    }
+
+    .no-results em {
+        color: #4da3ff;
+    }
+
+    .inline-clear-button {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .inline-clear-button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Filter error state dark mode styles */
+    .filter-container.filter-error {
+        background-color: #3a3000;
+        border-color: #ffc107;
+    }
+
+    .filter-error-message {
+        background-color: #2a2a2a;
+        border-left-color: #ffc107;
+    }
+
+    .filter-error-message .error-text {
+        color: #ffc107;
+    }
+
+    .filter-dropdown.filter-disabled,
+    .clear-filters-button.filter-disabled {
+        opacity: 0.5;
+        background-color: #2a2a2a;
     }
 }

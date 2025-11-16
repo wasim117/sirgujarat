@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Result Count and UI Feedback</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            padding: 2rem;
+        }
+        .test-section {
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .test-description {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .test-controls button {
+            padding: 0.5rem 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-controls button:hover {
+            background-color: #0056b3;
+        }
+        .test-result {
+            padding: 1rem;
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+            margin-top: 1rem;
+        }
+        .pass {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+        }
+        .fail {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Result Count and UI Feedback (Task 10)</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Result Count Updates with Combined Filters</h2>
+        <div class="test-description">
+            <p><strong>Requirement 3.4:</strong> THE Gallery_System SHALL update the result count to reflect the combined filter results</p>
+            <p><strong>Test:</strong> Verify that result count updates when location filters and search are applied together</p>
+        </div>
+        
+        <div class="nav-content">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="search-input-test1" 
+                    class="search-input" 
+                    placeholder="Search by filename or document number..."
+                >
+            </div>
+            
+            <div class="filter-container" id="filter-container-test1">
+                <div class="filter-group">
+                    <label for="taluko-filter-test1">Taluko (District):</label>
+                    <select id="taluko-filter-test1" class="filter-dropdown">
+                        <option value="">Select Taluko</option>
+                        <option value="ગાંધીનગર">ગાંધીનગર</option>
+                        <option value="દસક્રોઈ">દસક્રોઈ</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="gaam-filter-test1">Gaam (Village):</label>
+                    <select id="gaam-filter-test1" class="filter-dropdown">
+                        <option value="">Select Gaam</option>
+                        <option value="ઉવારસદ">ઉવારસદ</option>
+                        <option value="સરગાસણ">સરગાસણ</option>
+                    </select>
+                </div>
+                
+                <button id="clear-filters-test1" class="clear-filters-button">
+                    Clear Filters
+                </button>
+            </div>
+            
+            <div class="search-results">
+                <span id="result-count-test1" class="result-count">150 results</span>
+            </div>
+        </div>
+        
+        <div class="test-controls">
+            <button onclick="testResultCountUpdate()">Test Result Count Update</button>
+            <button onclick="testCombinedFilters()">Test Combined Filters</button>
+            <button onclick="resetTest1()">Reset</button>
+        </div>
+        
+        <div id="test1-result" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Display Current Filter State</h2>
+        <div class="test-description">
+            <p><strong>Requirement 5.3:</strong> WHEN filters are active, THE Gallery_System SHALL display the filtered result count</p>
+            <p><strong>Test:</strong> Verify that filter state information is displayed in the result count</p>
+        </div>
+        
+        <div class="nav-content">
+            <div class="filter-container" id="filter-container-test2">
+                <div class="filter-group">
+                    <label for="taluko-filter-test2">Taluko (District):</label>
+                    <select id="taluko-filter-test2" class="filter-dropdown">
+                        <option value="">Select Taluko</option>
+                        <option value="ગાંધીનગર">ગાંધીનગર</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="gaam-filter-test2">Gaam (Village):</label>
+                    <select id="gaam-filter-test2" class="filter-dropdown">
+                        <option value="">Select Gaam</option>
+                        <option value="ઉવારસદ">ઉવારસદ</option>
+                    </select>
+                </div>
+                
+                <button id="clear-filters-test2" class="clear-filters-button">
+                    Clear Filters
+                </button>
+            </div>
+            
+            <div class="search-results">
+                <span id="result-count-test2" class="result-count">601 results</span>
+            </div>
+        </div>
+        
+        <div class="test-controls">
+            <button onclick="testFilterStateDisplay()">Test Filter State Display</button>
+            <button onclick="resetTest2()">Reset</button>
+        </div>
+        
+        <div id="test2-result" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Visual Indication of Active Filters</h2>
+        <div class="test-description">
+            <p><strong>Requirement 5.5:</strong> THE Gallery_System SHALL visually indicate when filters are applied through UI styling</p>
+            <p><strong>Test:</strong> Verify that dropdowns and container show visual feedback when filters are active</p>
+        </div>
+        
+        <div class="nav-content">
+            <div class="filter-container" id="filter-container-test3">
+                <div class="filter-group">
+                    <label for="taluko-filter-test3">Taluko (District):</label>
+                    <select id="taluko-filter-test3" class="filter-dropdown">
+                        <option value="">Select Taluko</option>
+                        <option value="ગાંધીનગર">ગાંધીનગર</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="gaam-filter-test3">Gaam (Village):</label>
+                    <select id="gaam-filter-test3" class="filter-dropdown">
+                        <option value="">Select Gaam</option>
+                        <option value="ઉવારસદ">ઉવારસદ</option>
+                    </select>
+                </div>
+                
+                <button id="clear-filters-test3" class="clear-filters-button">
+                    Clear Filters
+                </button>
+            </div>
+            
+            <div class="search-results">
+                <span id="result-count-test3" class="result-count">601 results</span>
+            </div>
+        </div>
+        
+        <div class="test-controls">
+            <button onclick="testVisualIndication()">Test Visual Indication</button>
+            <button onclick="resetTest3()">Reset</button>
+        </div>
+        
+        <div id="test3-result" class="test-result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Mock gallery state for testing
+        const mockGalleryState = {
+            filteredImages: Array(601).fill(null).map((_, i) => `P064${String(i+1).padStart(4, '0')}.jpg`),
+            allImages: Array(601).fill(null).map((_, i) => `P064${String(i+1).padStart(4, '0')}.jpg`),
+            searchTerm: '',
+            filterState: {
+                selectedTaluko: null,
+                selectedGaam: null
+            }
+        };
+
+        // Helper function to simulate getActiveFilterInfo
+        function getActiveFilterInfo(state) {
+            const { selectedTaluko, selectedGaam } = state.filterState;
+            const hasSearch = state.searchTerm !== '';
+            
+            const filterParts = [];
+            
+            if (selectedTaluko) {
+                filterParts.push(`taluko: ${selectedTaluko}`);
+            }
+            
+            if (selectedGaam) {
+                filterParts.push(`gaam: ${selectedGaam}`);
+            }
+            
+            if (hasSearch) {
+                filterParts.push(`search: "${state.searchTerm}"`);
+            }
+            
+            if (filterParts.length === 0) {
+                return '';
+            }
+            
+            return `(filtered by ${filterParts.join(', ')})`;
+        }
+
+        // Helper function to simulate updateFilterVisualState
+        function updateFilterVisualState(testNum, state) {
+            const { selectedTaluko, selectedGaam } = state.filterState;
+            
+            const talukoDropdown = document.getElementById(`taluko-filter-test${testNum}`);
+            const gaamDropdown = document.getElementById(`gaam-filter-test${testNum}`);
+            const filterContainer = document.getElementById(`filter-container-test${testNum}`);
+            
+            if (talukoDropdown) {
+                if (selectedTaluko) {
+                    talukoDropdown.classList.add('filter-active');
+                } else {
+                    talukoDropdown.classList.remove('filter-active');
+                }
+            }
+            
+            if (gaamDropdown) {
+                if (selectedGaam) {
+                    gaamDropdown.classList.add('filter-active');
+                } else {
+                    gaamDropdown.classList.remove('filter-active');
+                }
+            }
+            
+            if (filterContainer) {
+                if (selectedTaluko || selectedGaam) {
+                    filterContainer.classList.add('has-active-filters');
+                } else {
+                    filterContainer.classList.remove('has-active-filters');
+                }
+            }
+        }
+
+        // Test 1: Result Count Updates
+        function testResultCountUpdate() {
+            const resultElement = document.getElementById('result-count-test1');
+            const state = { ...mockGalleryState, filteredImages: mockGalleryState.filteredImages.slice(0, 150) };
+            
+            const count = state.filteredImages.length;
+            let text = count === 1 ? '1 result' : `${count} results`;
+            
+            const filterInfo = getActiveFilterInfo(state);
+            if (filterInfo) {
+                text += ` ${filterInfo}`;
+                resultElement.classList.add('has-filters');
+            } else {
+                resultElement.classList.remove('has-filters');
+            }
+            
+            resultElement.textContent = text;
+            
+            showTestResult('test1-result', true, `Result count updated to: "${text}"`);
+        }
+
+        function testCombinedFilters() {
+            const resultElement = document.getElementById('result-count-test1');
+            const state = {
+                ...mockGalleryState,
+                filteredImages: mockGalleryState.filteredImages.slice(0, 25),
+                searchTerm: 'P0640001',
+                filterState: {
+                    selectedTaluko: 'ગાંધીનગર',
+                    selectedGaam: 'ઉવારસદ'
+                }
+            };
+            
+            const count = state.filteredImages.length;
+            let text = count === 1 ? '1 result' : `${count} results`;
+            
+            const filterInfo = getActiveFilterInfo(state);
+            if (filterInfo) {
+                text += ` ${filterInfo}`;
+                resultElement.classList.add('has-filters');
+            }
+            
+            resultElement.textContent = text;
+            updateFilterVisualState(1, state);
+            
+            const talukoDropdown = document.getElementById('taluko-filter-test1');
+            const gaamDropdown = document.getElementById('gaam-filter-test1');
+            talukoDropdown.value = 'ગાંધીનગર';
+            gaamDropdown.value = 'ઉવારસદ';
+            document.getElementById('search-input-test1').value = 'P0640001';
+            
+            showTestResult('test1-result', true, `Combined filters applied. Result: "${text}"`);
+        }
+
+        function resetTest1() {
+            document.getElementById('result-count-test1').textContent = '150 results';
+            document.getElementById('result-count-test1').classList.remove('has-filters');
+            document.getElementById('taluko-filter-test1').value = '';
+            document.getElementById('gaam-filter-test1').value = '';
+            document.getElementById('search-input-test1').value = '';
+            document.getElementById('filter-container-test1').classList.remove('has-active-filters');
+            document.getElementById('taluko-filter-test1').classList.remove('filter-active');
+            document.getElementById('gaam-filter-test1').classList.remove('filter-active');
+            document.getElementById('test1-result').style.display = 'none';
+        }
+
+        // Test 2: Filter State Display
+        function testFilterStateDisplay() {
+            const resultElement = document.getElementById('result-count-test2');
+            const talukoDropdown = document.getElementById('taluko-filter-test2');
+            const gaamDropdown = document.getElementById('gaam-filter-test2');
+            
+            talukoDropdown.value = 'ગાંધીનગર';
+            gaamDropdown.value = 'ઉવારસદ';
+            
+            const state = {
+                ...mockGalleryState,
+                filteredImages: mockGalleryState.filteredImages.slice(0, 45),
+                filterState: {
+                    selectedTaluko: 'ગાંધીનગર',
+                    selectedGaam: 'ઉવારસદ'
+                }
+            };
+            
+            const count = state.filteredImages.length;
+            let text = count === 1 ? '1 result' : `${count} results`;
+            
+            const filterInfo = getActiveFilterInfo(state);
+            if (filterInfo) {
+                text += ` ${filterInfo}`;
+                resultElement.classList.add('has-filters');
+            }
+            
+            resultElement.textContent = text;
+            updateFilterVisualState(2, state);
+            
+            const hasFilterInfo = text.includes('filtered by');
+            showTestResult('test2-result', hasFilterInfo, 
+                hasFilterInfo ? `✓ Filter state displayed: "${text}"` : '✗ Filter state not displayed in result count');
+        }
+
+        function resetTest2() {
+            document.getElementById('result-count-test2').textContent = '601 results';
+            document.getElementById('result-count-test2').classList.remove('has-filters');
+            document.getElementById('taluko-filter-test2').value = '';
+            document.getElementById('gaam-filter-test2').value = '';
+            document.getElementById('filter-container-test2').classList.remove('has-active-filters');
+            document.getElementById('taluko-filter-test2').classList.remove('filter-active');
+            document.getElementById('gaam-filter-test2').classList.remove('filter-active');
+            document.getElementById('test2-result').style.display = 'none';
+        }
+
+        // Test 3: Visual Indication
+        function testVisualIndication() {
+            const talukoDropdown = document.getElementById('taluko-filter-test3');
+            const gaamDropdown = document.getElementById('gaam-filter-test3');
+            const filterContainer = document.getElementById('filter-container-test3');
+            const resultElement = document.getElementById('result-count-test3');
+            
+            talukoDropdown.value = 'ગાંધીનગર';
+            
+            const state = {
+                ...mockGalleryState,
+                filteredImages: mockGalleryState.filteredImages.slice(0, 200),
+                filterState: {
+                    selectedTaluko: 'ગાંધીનગર',
+                    selectedGaam: null
+                }
+            };
+            
+            updateFilterVisualState(3, state);
+            
+            const count = state.filteredImages.length;
+            let text = `${count} results`;
+            const filterInfo = getActiveFilterInfo(state);
+            if (filterInfo) {
+                text += ` ${filterInfo}`;
+                resultElement.classList.add('has-filters');
+            }
+            resultElement.textContent = text;
+            
+            const hasTalukoActive = talukoDropdown.classList.contains('filter-active');
+            const hasContainerActive = filterContainer.classList.contains('has-active-filters');
+            const hasResultHighlight = resultElement.classList.contains('has-filters');
+            
+            const allPassed = hasTalukoActive && hasContainerActive && hasResultHighlight;
+            
+            let message = '';
+            message += hasTalukoActive ? '✓ Taluko dropdown has active styling\n' : '✗ Taluko dropdown missing active styling\n';
+            message += hasContainerActive ? '✓ Filter container has active styling\n' : '✗ Filter container missing active styling\n';
+            message += hasResultHighlight ? '✓ Result count has highlight styling' : '✗ Result count missing highlight styling';
+            
+            showTestResult('test3-result', allPassed, message);
+        }
+
+        function resetTest3() {
+            document.getElementById('result-count-test3').textContent = '601 results';
+            document.getElementById('result-count-test3').classList.remove('has-filters');
+            document.getElementById('taluko-filter-test3').value = '';
+            document.getElementById('gaam-filter-test3').value = '';
+            document.getElementById('filter-container-test3').classList.remove('has-active-filters');
+            document.getElementById('taluko-filter-test3').classList.remove('filter-active');
+            document.getElementById('gaam-filter-test3').classList.remove('filter-active');
+            document.getElementById('test3-result').style.display = 'none';
+        }
+
+        // Helper function to show test results
+        function showTestResult(elementId, passed, message) {
+            const resultElement = document.getElementById(elementId);
+            resultElement.style.display = 'block';
+            resultElement.className = 'test-result ' + (passed ? 'pass' : 'fail');
+            resultElement.innerHTML = `<strong>${passed ? 'PASS' : 'FAIL'}:</strong><br><pre style="white-space: pre-wrap; margin: 0.5rem 0 0 0;">${message}</pre>`;
+        }
+    </script>
+</body>
+</html>

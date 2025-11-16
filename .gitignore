@@ -61,3 +61,5 @@ htmlcov/
 
 # Images folder (large files)
 public/images/
+public-taluko/
+public-gaam/

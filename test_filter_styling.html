@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Styling Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            padding: 2rem;
+        }
+        .test-section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            margin-bottom: 1rem;
+            color: #007bff;
+        }
+        .test-description {
+            margin-bottom: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Filter Component Styling Test</h1>
+    
+    <div class="test-section">
+        <h2>Desktop Layout (Default)</h2>
+        <p class="test-description">Filters should be displayed horizontally with proper spacing</p>
+        <div class="filter-container">
+            <div class="filter-group">
+                <label for="taluko-test-1">Taluko (District):</label>
+                <select id="taluko-test-1" class="filter-dropdown">
+                    <option value="">Select Taluko</option>
+                    <option value="gandhinagar">ગાંધીનગર</option>
+                    <option value="daskroi">દસક્રોઈ</option>
+                    <option value="city">સીટી</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="gaam-test-1">Gaam (Village):</label>
+                <select id="gaam-test-1" class="filter-dropdown">
+                    <option value="">Select Gaam</option>
+                    <option value="uvarsad">ઉવારસદ</option>
+                    <option value="sargasan">સરગાસણ</option>
+                    <option value="shertha">શેરથા</option>
+                </select>
+            </div>
+            
+            <button class="clear-filters-button">Clear Filters</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Active Filter State</h2>
+        <p class="test-description">Selected dropdowns should have blue border and light blue background</p>
+        <div class="filter-container">
+            <div class="filter-group">
+                <label for="taluko-test-2">Taluko (District):</label>
+                <select id="taluko-test-2" class="filter-dropdown active">
+                    <option value="">Select Taluko</option>
+                    <option value="gandhinagar" selected>ગાંધીનગર</option>
+                    <option value="daskroi">દસક્રોઈ</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="gaam-test-2">Gaam (Village):</label>
+                <select id="gaam-test-2" class="filter-dropdown active">
+                    <option value="">Select Gaam</option>
+                    <option value="uvarsad" selected>ઉવારસદ</option>
+                    <option value="sargasan">સરગાસણ</option>
+                </select>
+            </div>
+            
+            <button class="clear-filters-button">Clear Filters</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Hover and Focus States</h2>
+        <p class="test-description">Hover over dropdowns and button to see hover effects. Tab through elements to see focus states.</p>
+        <div class="filter-container">
+            <div class="filter-group">
+                <label for="taluko-test-3">Taluko (District):</label>
+                <select id="taluko-test-3" class="filter-dropdown">
+                    <option value="">Select Taluko</option>
+                    <option value="gandhinagar">ગાંધીનગર</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="gaam-test-3">Gaam (Village):</label>
+                <select id="gaam-test-3" class="filter-dropdown">
+                    <option value="">Select Gaam</option>
+                    <option value="uvarsad">ઉવારસદ</option>
+                </select>
+            </div>
+            
+            <button class="clear-filters-button">Clear Filters</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Gujarati Text Rendering</h2>
+        <p class="test-description">Gujarati text should render properly in all dropdowns</p>
+        <div class="filter-container">
+            <div class="filter-group">
+                <label for="taluko-test-4">Taluko (District):</label>
+                <select id="taluko-test-4" class="filter-dropdown">
+                    <option value="">Select Taluko</option>
+                    <option value="gandhinagar">ગાંધીનગર</option>
+                    <option value="daskroi">દસક્રોઈ</option>
+                    <option value="city">સીટી</option>
+                    <option value="sanand">સાણંદ</option>
+                    <option value="bavla">બાવળા</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="gaam-test-4">Gaam (Village):</label>
+                <select id="gaam-test-4" class="filter-dropdown">
+                    <option value="">Select Gaam</option>
+                    <option value="uvarsad">ઉવારસદ</option>
+                    <option value="sargasan">સરગાસણ</option>
+                    <option value="shertha">શેરથા</option>
+                    <option value="motera">મોટેરા</option>
+                    <option value="chandkheda">ચાંદખેડા</option>
+                </select>
+            </div>
+            
+            <button class="clear-filters-button">Clear Filters</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Responsive Test</h2>
+        <p class="test-description">Resize browser window to less than 768px to see mobile layout (stacked vertically)</p>
+        <div class="filter-container">
+            <div class="filter-group">
+                <label for="taluko-test-5">Taluko (District):</label>
+                <select id="taluko-test-5" class="filter-dropdown">
+                    <option value="">Select Taluko</option>
+                    <option value="gandhinagar">ગાંધીનગર</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="gaam-test-5">Gaam (Village):</label>
+                <select id="gaam-test-5" class="filter-dropdown">
+                    <option value="">Select Gaam</option>
+                    <option value="uvarsad">ઉવારસદ</option>
+                </select>
+            </div>
+            
+            <button class="clear-filters-button">Clear Filters</button>
+        </div>
+    </div>
+
+    <script>
+        // Add active class when dropdown value changes
+        document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+            dropdown.addEventListener('change', function() {
+                if (this.value) {
+                    this.classList.add('active');
+                } else {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // Clear filters button functionality
+        document.querySelectorAll('.clear-filters-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const container = this.closest('.filter-container');
+                container.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+                    dropdown.value = '';
+                    dropdown.classList.remove('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
