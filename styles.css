@@ -87,6 +87,55 @@ button {
 }
 
 /* ============================================
+   Disclaimer Banner Styles
+   ============================================ */
+
+.disclaimer-banner {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-bottom: 3px solid #ffc107;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 101;
+}
+
+.disclaimer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.disclaimer-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.disclaimer-text {
+    font-size: 0.95rem;
+    color: #856404;
+    line-height: 1.5;
+}
+
+.disclaimer-text strong {
+    font-weight: 700;
+    color: #664d03;
+}
+
+.disclaimer-text a {
+    color: #0056b3;
+    font-weight: 600;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.disclaimer-text a:hover {
+    color: #003d82;
+}
+
+/* ============================================
    Navigation and Search Styles
    ============================================ */
 
@@ -650,6 +699,23 @@ button {
 
 /* Tablet and below */
 @media (max-width: 768px) {
+    .disclaimer-banner {
+        padding: 0.75rem;
+    }
+
+    .disclaimer-content {
+        flex-direction: row;
+        gap: 0.75rem;
+    }
+
+    .disclaimer-icon {
+        font-size: 1.25rem;
+    }
+
+    .disclaimer-text {
+        font-size: 0.85rem;
+    }
+
     .header {
         padding: 1.5rem 1rem;
     }
@@ -812,6 +878,27 @@ button {
 
     .header {
         background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+    }
+
+    .disclaimer-banner {
+        background: linear-gradient(135deg, #3a3000 0%, #4a3d00 100%);
+        border-bottom-color: #ffc107;
+    }
+
+    .disclaimer-text {
+        color: #ffc107;
+    }
+
+    .disclaimer-text strong {
+        color: #ffd54f;
+    }
+
+    .disclaimer-text a {
+        color: #4da3ff;
+    }
+
+    .disclaimer-text a:hover {
+        color: #80bdff;
     }
 
     .navigation {

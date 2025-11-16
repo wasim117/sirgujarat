@@ -455,7 +455,6 @@ function createImageCard(filename) {
             <div class="card-filename">${metadata.documentNumber}</div>
             <div class="card-info">
                 <div class="card-info-item">
-                    <span class="card-info-label">File:</span>
                     <span class="card-info-value">${filename}</span>
                 </div>
             </div>
@@ -482,7 +481,7 @@ function extractImageMetadata(filename) {
     // Extract document number from filename (e.g., P0640001.jpg -> P064-0001)
     const match = filename.match(/P064(\d+)/);
     const number = match ? match[1] : '0001';
-    const documentNumber = `P064-${number}`;
+    const documentNumber = `P064.zip/P064/P064${number}`;
     
     return {
         filename: filename,
