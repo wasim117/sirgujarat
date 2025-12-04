@@ -89,44 +89,8 @@
         </div>
     </div>
 
-    <nav class="navigation"></nav>
-        <div class="nav-content">
-            <div class="search-container">
-                <input 
-                    type="text" 
-                    id="search-input" 
-                    class="search-input" 
-                    placeholder="Search by filename or document number..."
-                    aria-label="Search gallery images"
-                >
-                <button id="clear-search" class="clear-button" aria-label="Clear search">Clear</button>
-            </div>
-            
-            <div class="filter-container">
-                <div class="filter-group">
-                    <label for="taluko-filter">Taluko (District):</label>
-                    <select id="taluko-filter" class="filter-dropdown" aria-label="Filter by taluko">
-                        <option value="">Select Taluko</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label for="gaam-filter">Gaam (Village):</label>
-                    <select id="gaam-filter" class="filter-dropdown" aria-label="Filter by gaam">
-                        <option value="">Select Gaam</option>
-                    </select>
-                </div>
-                
-                <button id="clear-filters" class="clear-filters-button" aria-label="Clear all location filters">
-                    Clear Filters
-                </button>
-            </div>
-            
-            <div class="search-results">
-                <span id="result-count" class="result-count">0 results</span>
-            </div>
-        </div>
-    </nav>
+    
+      
 
     <main class="main-content">
         <!-- SEO Content Section -->
@@ -146,10 +110,7 @@
             <p>The 2002 voter list gujarat collection includes address information organized systematically. Each document is available as a high-quality PDF for easy viewing and reference. This historical electoral roll serves as an important resource for research and verification purposes.</p>
         </section> -->
         
-        <div id="loading" class="loading" style="display: none;">
-            <div class="spinner"></div>
-            <p>Loading 2002 voter list gujarat records...</p>
-        </div>
+  
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0495755600187080"
      crossorigin="anonymous"></script>
 <ins class="adsbygoogle"
@@ -161,24 +122,42 @@
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-        <div id="gallery-grid" class="gallery-grid" role="region" aria-label="Image gallery">
-            <!-- Image cards will be generated here by JavaScript -->
-        </div>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0495755600187080"
-     crossorigin="anonymous"></script>
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-format="fluid"
-     data-ad-layout-key="-fb+5w+4e-db+86"
-     data-ad-client="ca-pub-0495755600187080"
-     data-ad-slot="7940452817"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-        <div id="no-results" class="no-results" style="display: none;">
-            <p>No images found matching your search.</p>
-        </div>
+    
+  
     </main>
+
+    <!-- Assembly Constituencies Links Section -->
+    <section class="assembly-links-section" style="padding: 40px 20px; background: #ffffff; margin: 40px 0;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h2 style="text-align: center; color: #007bff; margin-bottom: 30px; font-size: 28px;">Browse by Assembly Constituency</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">Select your assembly constituency to view the 2002 voter list:</p>
+            <div id="assembly-links-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                <!-- Assembly links will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0495755600187080"
+    crossorigin="anonymous"></script>
+<ins class="adsbygoogle"
+    style="display:block"
+    data-ad-format="fluid"
+    data-ad-layout-key="-fb+5w+4e-db+86"
+    data-ad-client="ca-pub-0495755600187080"
+    data-ad-slot="7940452817"></ins>
+<script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+    <!-- CTA Section for Fillable Form -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Need to Fill Out a Form?</h2>
+            <p>Access our fillable PDF form for your convenience</p>
+            <a href="public/fillable-form-sir.pdf" class="cta-button" target="_blank" rel="noopener noreferrer">
+                View Fillable Form
+            </a>
+        </div>
+    </section>
 
     <footer class="footer">
         <div class="footer-content">
@@ -188,11 +167,39 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
     
-    <!-- Show SEO content after page loads -->
+    <!-- Load Assembly Links -->
     <script>
+        async function loadAssemblyLinks() {
+            try {
+                const response = await fetch('assembly_constituencies.json');
+                const assemblies = await response.json();
+                const container = document.getElementById('assembly-links-container');
+                
+                assemblies.forEach(assembly => {
+                    const link = document.createElement('a');
+                    link.href = `${assembly.slug}.html`;
+                    link.textContent = assembly.full_name;
+                    link.style.cssText = 'display: block; padding: 12px 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.3s ease; text-align: center;';
+                    link.onmouseover = function() {
+                        this.style.background = '#007bff';
+                        this.style.color = '#fff';
+                        this.style.borderColor = '#007bff';
+                    };
+                    link.onmouseout = function() {
+                        this.style.background = '#f8f9fa';
+                        this.style.color = '#333';
+                        this.style.borderColor = '#dee2e6';
+                    };
+                    container.appendChild(link);
+                });
+            } catch (error) {
+                console.error('Error loading assembly links:', error);
+            }
+        }
+        
         window.addEventListener('DOMContentLoaded', function() {
+            loadAssemblyLinks();
             // Show SEO content section after a brief delay
             setTimeout(function() {
                 const seoSection = document.getElementById('seo-section');

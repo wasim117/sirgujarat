@@ -1091,3 +1091,125 @@ button {
         background-color: #2a2a2a;
     }
 }
+
+/* ============================================
+   CTA Section Styles
+   ============================================ */
+
+.cta-section {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    padding: 3rem 1rem;
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-content h2 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.cta-content p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background-color: white;
+    color: #007bff;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    color: #0056b3;
+}
+
+.cta-button:focus {
+    outline: 3px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 4px;
+}
+
+.cta-button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive CTA Styles */
+@media (max-width: 768px) {
+    .cta-section {
+        padding: 2rem 1rem;
+        margin-top: 2rem;
+    }
+
+    .cta-content h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .cta-content p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .cta-button {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cta-section {
+        padding: 1.5rem 1rem;
+    }
+
+    .cta-content h2 {
+        font-size: 1.3rem;
+    }
+
+    .cta-content p {
+        font-size: 0.95rem;
+    }
+
+    .cta-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* Dark mode CTA styles */
+@media (prefers-color-scheme: dark) {
+    .cta-section {
+        background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+    }
+
+    .cta-button {
+        background-color: #e0e0e0;
+        color: #0056b3;
+    }
+
+    .cta-button:hover {
+        color: #003d82;
+    }
+
+    .cta-button:focus {
+        outline-color: rgba(224, 224, 224, 0.5);
+    }
+}
