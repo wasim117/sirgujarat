@@ -61,5 +61,9 @@ htmlcov/
 
 # Images folder (large files)
 public/images/
+# But keep these specific image files
+!public/images/search-epic.jpg
+!public/images/search-name.jpg
+!public/images/gujarati-input.jpg
 public-taluko/
 public-gaam/
